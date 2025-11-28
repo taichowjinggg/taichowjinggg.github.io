@@ -70,6 +70,29 @@
             .card-title {
                 font-size: 1.1em;
                 color: #2c3e50;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+
+                a {
+                    color: inherit;
+                    text-decoration: none;
+
+                    &::before {
+                        content: '#';
+                        display: inline-block;
+                        width: 0em;
+                        opacity: 0;
+                        text-align: center;
+                        transition: width ease-out 0.3s, opacity ease-in 0.3s;
+                    }
+
+                    &:hover::before {
+                        width: 1em;
+                        opacity: 1;
+                    }
+                }
             }
 
             .card-text {
@@ -82,6 +105,12 @@
                 border-top: 1px solid #eee;
                 color: #95a5a6;
                 font-size: 0.9em;
+            }
+
+            .highlight {
+                border-color: #ffc107 !important;
+                box-shadow: 0 0 20px rgba(255, 193, 7, 0.5) !important;
+                transform: scale(1.02);
             }
 
             footer {
@@ -101,11 +130,11 @@
             const elements = items.map(({ width, height, title, format = 'png', messages }) => {
                 const element = document.createElement('div');
                 element.className = 'card';
-                element.attributes['data-title'] = title;
+                element.id = title;
                 element.innerHTML = `
                         <img class="card-img" alt="${title}" src="./assets/quotations/${title}.${format}" style="aspect-ratio: ${width} / ${height};">
                         <div class="card-content">
-                            <h2 class="card-title">${title}</h2>
+                            <h2 class="card-title"><a href="#${title}">${title}</a></h2>
                             <div class="card-text">${messages.join('<br>')}</div>
                         </div>
                     `;
@@ -126,10 +155,31 @@
 
             window.addEventListener('resize', resizeWaterfall);
             resizeWaterfall();
+
+            if (window.location.hash) {
+                scrollToSection(window.location.hash);
+            }
+
+            window.addEventListener('hashchange', function () {
+                scrollToSection(window.location.hash);
+            });
+
+            function scrollToSection(hash) {
+                hash = decodeURIComponent(hash.substring(1));
+                const element = document.getElementById(hash);
+                if (element) {
+                    element.classList.add('highlight');
+                    setTimeout(() => {
+                        element.classList.remove('highlight');
+                    }, 1000);
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
         </script>
         <br>
         <footer>
-            Join us on GitHub: <a href="https://github.com/taichowjinggg/taichowjinggg.github.io">taichowjinggg.github.io</a>
+            Join us on GitHub: <a
+                href="https://github.com/taichowjinggg/taichowjinggg.github.io">taichowjinggg.github.io</a>
         </footer>
     </body>
 </html>
