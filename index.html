@@ -58,21 +58,23 @@
                 width: 100%;
                 height: auto;
                 display: block;
+                background-size: cover;
+                background-position: center;
             }
 
             .card-content {
                 padding: 15px;
+                padding-top: 12px;
             }
 
             .card-title {
                 font-size: 1.1em;
-                margin-bottom: 8px;
                 color: #2c3e50;
             }
 
             .card-text {
+                margin-top: 4px;
                 color: #7f8c8d;
-                line-height: 1.5;
             }
 
             .card-footer {
@@ -81,45 +83,53 @@
                 color: #95a5a6;
                 font-size: 0.9em;
             }
+
+            footer {
+                text-align: center;
+                padding: 20px;
+            }
         </style>
     </head>
     <body>
         <h1>台州静哥哥圣经</h1>
-        <body>
-            <div class="waterfall" id="waterfall"></div>
-            <script type="module">
-                const res = await fetch('./assets/quotations.json');
-                const items = await res.json();
 
-                const elements = items.map(({ title, messages, format = 'png' }) => {
-                    const element = document.createElement('div');
-                    element.className = 'card';
-                    element.attributes['data-title'] = title;
-                    element.innerHTML = `
-                        <img class="card-img" src="./assets/quotations/${title}.${format}" alt="${title}">
+        <div class="waterfall" id="waterfall"></div>
+        <script type="module">
+            const res = await fetch('./assets/quotations.json');
+            const items = await res.json();
+
+            const elements = items.map(({ width, height, title, format = 'png', messages }) => {
+                const element = document.createElement('div');
+                element.className = 'card';
+                element.attributes['data-title'] = title;
+                element.innerHTML = `
+                        <img class="card-img" alt="${title}" src="./assets/quotations/${title}.${format}" style="aspect-ratio: ${width} / ${height};">
                         <div class="card-content">
                             <h2 class="card-title">${title}</h2>
-                            <span class="card-text">${messages.join('<br>')}</span>
+                            <div class="card-text">${messages.join('<br>')}</div>
                         </div>
                     `;
-                    return element;
-                });
+                return element;
+            });
 
-                const waterfall = new Waterfall('waterfall', elements, 20);
+            const waterfall = new Waterfall('waterfall', elements, 20);
 
-                function resizeWaterfall() {
-                    if (window.innerWidth >= 1440) {
-                        waterfall.handleResize(4);
-                    } else if (window.innerWidth >= 1024) {
-                        waterfall.handleResize(3);
-                    } else if (window.innerWidth) {
-                        waterfall.handleResize(2);
-                    }
+            function resizeWaterfall() {
+                if (window.innerWidth >= 1440) {
+                    waterfall.handleResize(4);
+                } else if (window.innerWidth >= 1024) {
+                    waterfall.handleResize(3);
+                } else if (window.innerWidth) {
+                    waterfall.handleResize(2);
                 }
+            }
 
-                window.addEventListener('resize', resizeWaterfall);
-                resizeWaterfall();
-            </script>
-        </body>
+            window.addEventListener('resize', resizeWaterfall);
+            resizeWaterfall();
+        </script>
+        <br>
+        <footer>
+            Join us on GitHub: <a href="https://github.com/taichowjinggg/taichowjinggg.github.io">taichowjinggg.github.io</a>
+        </footer>
     </body>
 </html>

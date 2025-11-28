@@ -32,15 +32,15 @@ class Waterfall {
   distributeItems() {
     const columns = this.container.querySelectorAll('.waterfall-column');
 
-    this.columnHeights = new Array(this.columns).fill(0);
+    const columnHeights = new Array(this.columns).fill(0);
 
     this.elements.forEach(element => {
-      const minHeight = Math.min(...this.columnHeights);
-      const columnIndex = this.columnHeights.indexOf(minHeight);
+      const minHeight = Math.min(...columnHeights);
+      const columnIndex = columnHeights.indexOf(minHeight);
 
       columns[columnIndex].appendChild(element);
 
-      this.columnHeights[columnIndex] += element.offsetHeight + this.elementGap;
+      columnHeights[columnIndex] += element.offsetHeight + this.elementGap;
     });
   }
 }
