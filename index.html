@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>台州静哥哥圣经</title>
+        <script src="./waterfall.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            header {
+                text-align: center;
+                margin-bottom: 30px;
+                padding: 20px;
+            }
+
+            h1 {
+                text-align: center;
+                color: #2c3e50;
+                margin-bottom: 10px;
+                font-size: 2em;
+                padding: 20px 0;
+            }
+
+            .waterfall {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                gap: 20px;
+                padding: 0 20px;
+            }
+
+            .waterfall-column {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                flex: 1;
+            }
+
+            .card {
+                background: white;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            }
+
+            .card-img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+
+            .card-content {
+                padding: 15px;
+            }
+
+            .card-title {
+                font-size: 1.1em;
+                margin-bottom: 8px;
+                color: #2c3e50;
+            }
+
+            .card-text {
+                color: #7f8c8d;
+                line-height: 1.5;
+            }
+
+            .card-footer {
+                padding: 10px 15px;
+                border-top: 1px solid #eee;
+                color: #95a5a6;
+                font-size: 0.9em;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>台州静哥哥圣经</h1>
+        <body>
+            <div class="waterfall" id="waterfall"></div>
+            <script type="module">
+                const res = await fetch('./assets/quotations.json');
+                const items = await res.json();
+
+                const elements = items.map(({ title, messages, format = 'png' }) => {
+                    const element = document.createElement('div');
+                    element.className = 'card';
+                    element.attributes['data-title'] = title;
+                    element.innerHTML = `
+                        <img class="card-img" src="./assets/quotations/${title}.${format}" alt="${title}">
+                        <div class="card-content">
+                            <h2 class="card-title">${title}</h2>
+                            <span class="card-text">${messages.join('<br>')}</span>
+                        </div>
+                    `;
+                    return element;
+                });
+
+                const waterfall = new Waterfall('waterfall', elements, 20);
+
+                function resizeWaterfall() {
+                    if (window.innerWidth >= 1440) {
+                        waterfall.handleResize(4);
+                    } else if (window.innerWidth >= 1024) {
+                        waterfall.handleResize(3);
+                    } else if (window.innerWidth) {
+                        waterfall.handleResize(2);
+                    }
+                }
+
+                window.addEventListener('resize', resizeWaterfall);
+                resizeWaterfall();
+            </script>
+        </body>
+    </body>
+</html>
