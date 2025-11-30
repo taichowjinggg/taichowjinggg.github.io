@@ -10,12 +10,19 @@
     <body>
         <h1>静哥哥圣经</h1>
         <div class="actions">
-            <input type="checkbox" id="toggleDisplay"></input>
-            <label for="toggleDisplay">显示消息窗口</label>
-            <input type="checkbox" id="toggleTitle"></input>
-            <label for="toggleTitle">显示卡片标题</label>
-            <input type="checkbox" id="toggleDetail"></input>
-            <label for="toggleDetail">显示对话内容</label>
+            <label>
+                原始截图
+                <input class="switch" type="checkbox" id="toggleDisplay">
+                消息窗口
+            </label>
+            <label>
+                显示卡片标题
+                <input class="switch" type="checkbox" id="toggleTitle"></input>
+            </label>
+            <label>
+                显示对话内容
+                <input class="switch" type="checkbox" id="toggleDetail"></input>
+            </label>
         </div>
         <div class="waterfall" id="waterfall"></div>
         <template id="message-template">
