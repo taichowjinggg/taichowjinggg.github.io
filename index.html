@@ -97,7 +97,15 @@
                     return card;
                 }
 
-                const waterfall = new Waterfall('waterfall', items.map(item => renderCard(item)), 20);
+                function shuffleArray(arr) {
+                    for (let i = arr.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [arr[i], arr[j]] = [arr[j], arr[i]];
+                    }
+                    return arr;
+                }
+
+                const waterfall = new Waterfall('waterfall', shuffleArray(items.map(item => renderCard(item))), 20);
 
                 for (let value of params.getAll('mock')) {
                     let [title, ...messages] = value.split(':');
@@ -111,8 +119,10 @@
                         waterfall.handleResize(4);
                     } else if (window.innerWidth >= 1024) {
                         waterfall.handleResize(3);
-                    } else if (window.innerWidth) {
+                    } else if (window.innerWidth >= 768) {
                         waterfall.handleResize(2);
+                    } else {
+                        waterfall.handleResize(1);
                     }
                 }
                 window.addEventListener('resize', resizeWaterfall);
@@ -130,8 +140,9 @@
 
                 resizeWaterfall();
                 scrollToHashIfValid();
+                document.getElementById('toggleTitle').click();
             </script>
-            Join us on GitHub: <a href="https://github.com/taichowjinggg">taichowjinggg</a>
+            Join us on GitHub: <a href="https://github.com/iJingTV">iJingTV</a>
         </footer>
     </body>
 </html>
