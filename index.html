@@ -105,7 +105,7 @@
                     return arr;
                 }
 
-                const waterfall = new Waterfall('waterfall', shuffleArray(items.map(item => renderCard(item))), 20);
+                const waterfall = new Waterfall('waterfall', (items.map(item => renderCard(item))), 20);
 
                 for (let value of params.getAll('mock')) {
                     let [title, ...messages] = value.split(':');
