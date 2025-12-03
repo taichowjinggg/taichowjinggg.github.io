@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>图片上传工具</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                padding: 30px;
+            }
+
+            h1 {
+                text-align: center;
+                color: #2c3e50;
+                margin-bottom: 30px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #3498db;
+            }
+
+            .upload-area {
+                border: 3px dashed #3498db;
+                border-radius: 10px;
+                padding: 40px;
+                text-align: center;
+                margin-bottom: 30px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                background: #f8fafc;
+            }
+
+            .upload-area:hover {
+                background: #ebf5ff;
+                border-color: #2980b9;
+            }
+
+            .upload-area.dragover {
+                background: #e3f2fd;
+                border-color: #1e88e5;
+            }
+
+            .upload-icon {
+                font-size: 48px;
+                color: #3498db;
+                margin-bottom: 15px;
+            }
+
+            .preview-container {
+                display: none;
+                margin-bottom: 30px;
+            }
+
+            #imagePreview {
+                max-width: 100%;
+                max-height: 300px;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                margin-bottom: 15px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            input,
+            select,
+            textarea {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #e0e0e0;
+                border-radius: 6px;
+                font-size: 14px;
+                transition: border-color 0.3s ease;
+            }
+
+            input:focus,
+            select:focus,
+            textarea:focus {
+                outline: none;
+                border-color: #3498db;
+            }
+
+            .messages-container {
+                margin-bottom: 20px;
+            }
+
+            .message-item {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            .message-item input {
+                flex: 1;
+            }
+
+            .btn {
+                padding: 12px 24px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .btn-primary {
+                background: #3498db;
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background: #2980b9;
+                transform: translateY(-2px);
+            }
+
+            .btn-secondary {
+                background: #95a5a6;
+                color: white;
+            }
+
+            .btn-secondary:hover {
+                background: #7f8c8d;
+            }
+
+            .btn-danger {
+                background: #e74c3c;
+                color: white;
+                padding: 8px 12px;
+            }
+
+            .btn-add {
+                background: #2ecc71;
+                color: white;
+                margin-top: 10px;
+            }
+
+            .btn-add:hover {
+                background: #27ae60;
+            }
+
+            .buttons {
+                display: flex;
+                gap: 15px;
+                margin-top: 30px;
+            }
+
+            .image-info {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-top: 15px;
+            }
+
+            .info-item {
+                background: #f8f9fa;
+                padding: 10px;
+                border-radius: 6px;
+                text-align: center;
+            }
+
+            .info-item span {
+                font-weight: 600;
+                color: #3498db;
+            }
+
+            .loading {
+                display: none;
+                text-align: center;
+                margin: 20px 0;
+            }
+
+            .spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #3498db;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 0 auto 15px;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .alert {
+                padding: 15px;
+                border-radius: 6px;
+                margin-bottom: 20px;
+                display: none;
+            }
+
+            .alert-success {
+                background: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+
+            .alert-error {
+                background: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>📷 图片上传工具</h1>
+
+            <div class="alert" id="alert"></div>
+
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <h3>点击选择图片或拖拽到此处</h3>
+                <p>支持 JPG, PNG 格式，最大 10MB</p>
+                <input type="file" id="fileInput" accept="image/jpeg,image/png" style="display: none;">
+            </div>
+
+            <div class="preview-container" id="previewContainer">
+                <img id="imagePreview" src="" alt="图片预览">
+                <div class="image-info">
+                    <div class="info-item">
+                        宽度: <span id="widthInfo">0</span> px
+                    </div>
+                    <div class="info-item">
+                        高度: <span id="heightInfo">0</span> px
+                    </div>
+                </div>
+            </div>
+
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="title">标题 *</label>
+                    <input type="text" id="title" name="title" required placeholder="输入图片标题（将作为文件名）">
+                </div>
+
+                <div class="form-group">
+                    <label for="format">格式</label>
+                    <select id="format" name="format">
+                        <option value="png">PNG</option>
+                        <option value="jpg">JPG</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="footer">底部文字（可选）</label>
+                    <input type="text" id="footer" name="footer" placeholder="输入底部显示的文字">
+                </div>
+
+                <div class="messages-container">
+                    <label>消息内容 *</label>
+                    <div id="messagesList">
+                        <div class="message-item">
+                            <input type="text" name="messages[]" required placeholder="输入第一条消息">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-add" id="addMessage">
+                        + 添加消息
+                    </button>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>正在上传和处理图片...</p>
+                </div>
+
+                <div class="buttons">
+                    <button type="submit" class="btn btn-primary">
+                        📤 上传并保存
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="resetBtn">
+                        🔄 重置
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            // DOM 元素
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const previewContainer = document.getElementById('previewContainer');
+            const imagePreview = document.getElementById('imagePreview');
+            const widthInfo = document.getElementById('widthInfo');
+            const heightInfo = document.getElementById('heightInfo');
+            const uploadForm = document.getElementById('uploadForm');
+            const messagesList = document.getElementById('messagesList');
+            const addMessageBtn = document.getElementById('addMessage');
+            const resetBtn = document.getElementById('resetBtn');
+            const loading = document.getElementById('loading');
+            const alert = document.getElementById('alert');
+
+            // 全局变量存储图片数据
+            let imageFile = null;
+            let imageWidth = 0;
+            let imageHeight = 0;
+
+            // 点击上传区域触发文件选择
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // 拖拽功能
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+
+                if (e.dataTransfer.files.length) {
+                    handleFileSelect(e.dataTransfer.files[0]);
+                }
+            });
+
+            // 文件选择处理
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleFileSelect(e.target.files[0]);
+                }
+            });
+
+            function handleFileSelect(file) {
+                // 验证文件类型
+                if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+                    showAlert('请选择 JPG 或 PNG 格式的图片', 'error');
+                    return;
+                }
+
+                // 验证文件大小（10MB）
+                if (file.size > 10 * 1024 * 1024) {
+                    showAlert('图片大小不能超过 10MB', 'error');
+                    return;
+                }
+
+                imageFile = file;
+
+                // 读取图片并获取尺寸
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        imageWidth = img.width;
+                        imageHeight = img.height;
+
+                        // 显示预览
+                        imagePreview.src = e.target.result;
+                        previewContainer.style.display = 'block';
+                        widthInfo.textContent = imageWidth;
+                        heightInfo.textContent = imageHeight;
+
+                        // 根据实际格式设置选择器
+                        const format = file.type.split('/')[1];
+                        if (format === 'jpeg') format = 'jpg';
+                        document.getElementById('format').value = format;
+
+                        // 自动生成标题（使用文件名去掉扩展名）
+                        const title = file.name.replace(/\.[^/.]+$/, "");
+                        document.getElementById('title').value = title;
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // 添加消息输入框
+            addMessageBtn.addEventListener('click', () => {
+                const messageItem = document.createElement('div');
+                messageItem.className = 'message-item';
+                messageItem.innerHTML = `
+                <input type="text" name="messages[]" required placeholder="输入消息内容">
+                <button type="button" class="btn btn-danger remove-message">×</button>
+            `;
+                messagesList.appendChild(messageItem);
+
+                // 添加删除功能
+                messageItem.querySelector('.remove-message').addEventListener('click', () => {
+                    if (messagesList.children.length > 1) {
+                        messageItem.remove();
+                    }
+                });
+            });
+
+            // 表单提交
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                if (!imageFile) {
+                    showAlert('请先选择图片', 'error');
+                    return;
+                }
+
+                // 验证表单
+                const title = document.getElementById('title').value.trim();
+                if (!title) {
+                    showAlert('请输入标题', 'error');
+                    return;
+                }
+
+                // 收集消息
+                const messages = Array.from(document.querySelectorAll('input[name="messages[]"]'))
+                    .map(input => input.value.trim())
+                    .filter(msg => msg !== '');
+
+                if (messages.length === 0) {
+                    showAlert('请至少输入一条消息', 'error');
+                    return;
+                }
+
+                // 准备表单数据
+                const formData = new FormData();
+                formData.append('image', imageFile);
+                formData.append('width', imageWidth);
+                formData.append('height', imageHeight);
+                formData.append('title', title);
+                formData.append('format', document.getElementById('format').value);
+                formData.append('footer', document.getElementById('footer').value.trim());
+                formData.append('messages', JSON.stringify(messages));
+
+                // 显示加载状态
+                loading.style.display = 'block';
+
+                try {
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showAlert('上传成功！图片和配置已保存。', 'success');
+                        resetForm();
+                    } else {
+                        showAlert(`上传失败: ${result.message}`, 'error');
+                    }
+                } catch (error) {
+                    showAlert('网络错误，请稍后重试', 'error');
+                } finally {
+                    loading.style.display = 'none';
+                }
+            });
+
+            // 重置表单
+            resetBtn.addEventListener('click', resetForm);
+
+            function resetForm() {
+                uploadForm.reset();
+                imagePreview.src = '';
+                previewContainer.style.display = 'none';
+                imageFile = null;
+                imageWidth = 0;
+                imageHeight = 0;
+
+                // 重置消息列表为一条
+                messagesList.innerHTML = `
+                <div class="message-item">
+                    <input type="text" name="messages[]" required placeholder="输入消息内容">
+                </div>
+            `;
+
+                // 隐藏警告
+                alert.style.display = 'none';
+            }
+
+            function showAlert(message, type = 'success') {
+                alert.textContent = message;
+                alert.className = `alert alert-${type}`;
+                alert.style.display = 'block';
+
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            }
+        </script>
+    </body>
+</html>

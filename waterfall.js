@@ -1,4 +1,3 @@
-
 class Waterfall {
   /**
    * @param {string} containerId
